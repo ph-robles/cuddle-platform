@@ -10,10 +10,35 @@ export default function SignupPage() {
   const [state, setState] = useState("")
   const [bio, setBio] = useState("")
   const [price, setPrice] = useState("")
+  const [photo, setPhoto] = useState<File | null>(null)
  
   async function handleSubmit(e:any) {
  
     e.preventDefault()
+ 
+    let photo_url = ""
+ 
+    if(photo){
+ 
+      const fileName = Date.now() + "-" + photo.name
+ 
+      const { data, error } = await supabase
+        .storage
+        .from("profile-photos")
+        .upload(fileName, photo)
+ 
+      if(error){
+        alert("Error uploading photo")
+        return
+      }
+ 
+      const { data: publicUrl } = supabase
+        .storage
+        .from("profile-photos")
+        .getPublicUrl(fileName)
+ 
+      photo_url = publicUrl.publicUrl
+    }
  
     const { error } = await supabase
       .from("cuddlers")
@@ -23,13 +48,14 @@ export default function SignupPage() {
           city,
           state,
           bio,
-          price
+          price,
+          photo_url
         }
       ])
  
-    if (error) {
+    if(error){
       alert("Error creating profile")
-    } else {
+    }else{
       alert("Profile created!")
     }
  
@@ -77,6 +103,11 @@ export default function SignupPage() {
           className="border p-3 rounded"
           value={price}
           onChange={(e)=>setPrice(e.target.value)}
+        />
+ 
+        <input
+          type="file"
+          onChange={(e)=>setPhoto(e.target.files?.[0] || null)}
         />
  
         <button className="bg-black text-white p-3 rounded">
