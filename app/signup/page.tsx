@@ -1,101 +1,119 @@
 'use client'
  
 import { useState } from "react"
-import { createClient } from "@supabase/supabase-js"
+import { supabase } from "../../lib/supabase"
 import { useRouter } from "next/navigation"
  
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
- 
-export default function SignupPage() {
+export default function SignupPage(){
  
   const router = useRouter()
  
-  const [name, setName] = useState("")
-  const [city, setCity] = useState("")
-  const [price, setPrice] = useState("")
-  const [photo, setPhoto] = useState("")
-  const [description, setDescription] = useState("")
+  const [name,setName] = useState("")
+  const [city,setCity] = useState("")
+  const [state,setState] = useState("")
+  const [bio,setBio] = useState("")
+  const [price,setPrice] = useState("")
  
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e:any){
+ 
     e.preventDefault()
  
-    // ✅ VALIDAÇÃO
-    if (!name || !city || !price) {
+    // validação simples
+    if(!name || !city || !price){
       alert("Please fill all required fields")
       return
     }
  
+    // pegar usuário logado
+    const { data:userData, error:userError } = await supabase.auth.getUser()
+ 
+    if(userError || !userData.user){
+      alert("You must be logged in")
+      router.push("/login")
+      return
+    }
+ 
+    const user_id = userData.user.id
+ 
+    // inserir no banco
     const { error } = await supabase
       .from("cuddlers")
       .insert([
         {
           name,
           city,
-          price: Number(price),
-          photo,
-          description
+          state,
+          bio,
+          price,
+          user_id
         }
       ])
  
-    if (error) {
+    if(error){
       alert("Error creating profile")
       console.log(error)
-      return
+    }else{
+      alert("Profile created!")
+      router.push("/")
     }
  
-    window.location.href="/"
- 
-    router.push("/")
   }
  
-  return (
-    <main style={{ maxWidth: 600, margin: "40px auto", padding: 20 }}>
-      <h1>Create your Cuddler Profile</h1>
+  return(
  
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: 12 }}
-      >
+    <main className="max-w-xl mx-auto p-10">
+ 
+      <h1 className="text-3xl font-bold mb-6">
+        Create your Cuddler Profile
+      </h1>
+ 
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
  
         <input
-          placeholder="Name *"
+          placeholder="Name"
+          className="border p-3"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e)=>setName(e.target.value)}
         />
  
         <input
-          placeholder="City *"
+          placeholder="City"
+          className="border p-3"
           value={city}
-          onChange={(e) => setCity(e.target.value)}
+          onChange={(e)=>setCity(e.target.value)}
         />
  
         <input
-          placeholder="Price per hour *"
-          type="number"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-        />
- 
-        <input
-          placeholder="Photo URL"
-          value={photo}
-          onChange={(e) => setPhoto(e.target.value)}
+          placeholder="State"
+          className="border p-3"
+          value={state}
+          onChange={(e)=>setState(e.target.value)}
         />
  
         <textarea
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Bio"
+          className="border p-3"
+          value={bio}
+          onChange={(e)=>setBio(e.target.value)}
         />
  
-        <button type="submit">
+        <input
+          placeholder="Price per hour"
+          type="number"
+          className="border p-3"
+          value={price}
+          onChange={(e)=>setPrice(e.target.value)}
+        />
+ 
+        <button className="bg-black text-white p-3 rounded">
           Create Profile
         </button>
  
       </form>
+ 
     </main>
+ 
   )
-}////////////////
+ 
+}
+ 
