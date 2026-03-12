@@ -1,43 +1,31 @@
 'use client'
  
 import { useState } from "react"
-import { supabase } from "../../lib/supabase"
+import { createClient } from "@supabase/supabase-js"
+import { useRouter } from "next/navigation"
+ 
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
  
 export default function SignupPage() {
  
+  const router = useRouter()
+ 
   const [name, setName] = useState("")
   const [city, setCity] = useState("")
-  const [state, setState] = useState("")
-  const [bio, setBio] = useState("")
   const [price, setPrice] = useState("")
-  const [photo, setPhoto] = useState<File | null>(null)
+  const [photo, setPhoto] = useState("")
+  const [description, setDescription] = useState("")
  
-  async function handleSubmit(e:any) {
- 
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
  
-    let photo_url = ""
- 
-    if(photo){
- 
-      const fileName = Date.now() + "-" + photo.name
- 
-      const { data, error } = await supabase
-        .storage
-        .from("profile-photos")
-        .upload(fileName, photo)
- 
-      if(error){
-        alert("Error uploading photo")
-        return
-      }
- 
-      const { data: publicUrl } = supabase
-        .storage
-        .from("profile-photos")
-        .getPublicUrl(fileName)
- 
-      photo_url = publicUrl.publicUrl
+    // ✅ VALIDAÇÃO
+    if (!name || !city || !price) {
+      alert("Please fill all required fields")
+      return
     }
  
     const { error } = await supabase
@@ -46,76 +34,68 @@ export default function SignupPage() {
         {
           name,
           city,
-          state,
-          bio,
-          price,
-          photo_url
+          price: Number(price),
+          photo,
+          description
         }
       ])
  
-    if(error){
+    if (error) {
       alert("Error creating profile")
-    }else{
-      alert("Profile created!")
+      console.log(error)
+      return
     }
  
+    window.location.href="/"
+ 
+    router.push("/")
   }
  
   return (
-    <main className="max-w-xl mx-auto p-10">
+    <main style={{ maxWidth: 600, margin: "40px auto", padding: 20 }}>
+      <h1>Create your Cuddler Profile</h1>
  
-      <h1 className="text-3xl font-bold mb-6">
-        Create Your Cuddler Profile
-      </h1>
- 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: "flex", flexDirection: "column", gap: 12 }}
+      >
  
         <input
-          placeholder="Name"
-          className="border p-3 rounded"
+          placeholder="Name *"
           value={name}
-          onChange={(e)=>setName(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
         />
  
         <input
-          placeholder="City"
-          className="border p-3 rounded"
+          placeholder="City *"
           value={city}
-          onChange={(e)=>setCity(e.target.value)}
+          onChange={(e) => setCity(e.target.value)}
         />
  
         <input
-          placeholder="State"
-          className="border p-3 rounded"
-          value={state}
-          onChange={(e)=>setState(e.target.value)}
+          placeholder="Price per hour *"
+          type="number"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+ 
+        <input
+          placeholder="Photo URL"
+          value={photo}
+          onChange={(e) => setPhoto(e.target.value)}
         />
  
         <textarea
-          placeholder="Bio"
-          className="border p-3 rounded"
-          value={bio}
-          onChange={(e)=>setBio(e.target.value)}
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
         />
  
-        <input
-          placeholder="Price per hour"
-          className="border p-3 rounded"
-          value={price}
-          onChange={(e)=>setPrice(e.target.value)}
-        />
- 
-        <input
-          type="file"
-          onChange={(e)=>setPhoto(e.target.files?.[0] || null)}
-        />
- 
-        <button className="bg-black text-white p-3 rounded">
+        <button type="submit">
           Create Profile
         </button>
  
       </form>
- 
     </main>
   )
-}
+}////////////////

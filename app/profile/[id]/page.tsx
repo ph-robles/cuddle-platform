@@ -1,45 +1,86 @@
-import { supabase } from "../../../lib/supabase"
+import { createClient } from '@supabase/supabase-js'
+import Image from 'next/image'
+import ReviewForm from "../../../components/ReviewForm"
  
-export default async function ProfilePage({ params }: any) {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+ 
+export default async function ProfilePage({ params }: { params: { id: string } }) {
  
   const { data: cuddler } = await supabase
-    .from("cuddlers")
-    .select("*")
-    .eq("id", params.id)
+    .from('cuddlers')
+    .select('*')
+    .eq('id', params.id)
     .single()
  
+  const { data: reviews } = await supabase
+    .from('reviews')
+    .select('*')
+    .eq('cuddler_id', params.id)
+    .order('created_at', { ascending: false })
+ 
   if (!cuddler) {
-    return <p className="p-10">Cuddler not found</p>
+    return (
+      <main style={{ padding: 40 }}>
+        <h1>Cuddler não encontrado</h1>
+      </main>
+    )
   }
  
   return (
-    <main className="max-w-4xl mx-auto p-10">
+    <main style={{ maxWidth: 900, margin: "40px auto", padding: 20 }}>
  
-      <img
-        src={cuddler.photo_url || "/placeholder.jpg"}
+      <h1>{cuddler.name}</h1>
+ 
+      <Image
+        src={cuddler.photo}
         alt={cuddler.name}
-        className="w-full h-96 object-cover rounded-xl mb-6"
+        width={300}
+        height={300}
+        style={{ borderRadius: 12 }}
       />
  
-      <h1 className="text-4xl font-bold mb-2">
-        {cuddler.name}
-      </h1>
- 
-      <p className="text-gray-500 mb-4">
-        {cuddler.city} - {cuddler.state}
+      <p style={{ marginTop: 20 }}>
+        {cuddler.description}
       </p>
  
-      <p className="text-lg mb-6">
-        {cuddler.bio}
+      <p>
+        <strong>Cidade:</strong> {cuddler.city}
       </p>
  
-      <p className="text-2xl font-bold mb-6">
-        ${cuddler.price} / hour
+      <p>
+        <strong>Preço:</strong> R$ {cuddler.price}/hora
       </p>
  
-      <button className="bg-black text-white px-6 py-3 rounded">
-        Book Session
-      </button>
+      <h2 style={{ marginTop: 40 }}>
+        Avaliações
+      </h2>
+ 
+      {reviews && reviews.length > 0 ? (
+        reviews.map((review: any) => (
+          <div
+            key={review.id}
+            style={{
+              border: "1px solid #ddd",
+              padding: 12,
+              borderRadius: 8,
+              marginTop: 10
+            }}
+          >
+            <strong>{review.name}</strong>
+            <p>⭐ {review.rating}</p>
+            <p>{review.comment}</p>
+          </div>
+        ))
+      ) : (
+        <p>Nenhuma avaliação ainda.</p>
+      )}
+ 
+      {/* FORMULÁRIO PARA NOVA REVIEW */}
+ 
+      <ReviewForm cuddler_id={params.id} />
  
     </main>
   )
