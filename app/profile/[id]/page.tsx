@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import Image from 'next/image'
 import ReviewForm from "../../../components/ReviewForm"
+import MessageForm from "../../../components/MessageForm"
  
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -50,9 +51,13 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         <strong>Cidade:</strong> {cuddler.city}
       </p>
  
-      <p>
-        <strong>Preço:</strong> R$ {cuddler.price}/hora
+      <p style={{ fontSize: "24px", fontWeight: "bold", marginBottom: 20 }}>
+        ${cuddler.price} / hour
       </p>
+ 
+      {/* BOTÃO / FORMULÁRIO DE MENSAGEM */}
+ 
+      <MessageForm receiver_id={cuddler.user_id}/>
  
       <h2 style={{ marginTop: 40 }}>
         Avaliações
@@ -78,7 +83,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         <p>Nenhuma avaliação ainda.</p>
       )}
  
-      {/* FORMULÁRIO PARA NOVA REVIEW */}
+      {/* FORMULÁRIO DE REVIEW */}
  
       <ReviewForm cuddler_id={params.id} />
  

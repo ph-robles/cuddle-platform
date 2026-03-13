@@ -1,76 +1,67 @@
 'use client'
  
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { supabase } from "../../lib/supabase"
+import { createClient } from "@supabase/supabase-js"
  
-export default function Dashboard(){
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
  
-  const router = useRouter()
+export default function DashboardPage() {
  
-  const [profile,setProfile] = useState<any>(null)
+  const [user, setUser] = useState<any>(null)
+  const [messages, setMessages] = useState<any[]>([])
  
-  const [loading,setLoading] = useState(true)
- 
-  useEffect(()=>{
- 
+  useEffect(() => {
     loadProfile()
+  }, [])
  
-  },[])
+  async function loadProfile() {
  
-  async function loadProfile(){
+    const { data: { user } } = await supabase.auth.getUser()
  
-    const { data:userData } = await supabase.auth.getUser()
- 
-    const user = userData.user
- 
-    if(!user){
- 
-      router.push("/login")
- 
+    if (!user) {
+      window.location.href = "/login"
       return
- 
     }
  
-    const { data } = await supabase
-      .from("cuddlers")
+    setUser(user)
+ 
+    const { data: messagesData } = await supabase
+      .from("messages")
       .select("*")
-      .eq("user_id",user.id)
-      .single()
+      .eq("receiver_id", user.id)
  
-    setProfile(data)
- 
-    setLoading(false)
- 
+    setMessages(messagesData || [])
   }
  
-  if(loading){
- 
-    return <div className="p-10">Loading...</div>
- 
-  }
- 
-  if(!profile){
- 
-    return <div className="p-10">Create your cuddler profile first.</div>
- 
-  }
- 
-  return(
- 
-    <main className="max-w-xl mx-auto p-10">
+  return (
+    <main className="max-w-3xl mx-auto p-6">
  
       <h1 className="text-3xl font-bold mb-6">
-        Your Dashboard
+        Dashboard
       </h1>
  
-      <p>
-        Welcome {profile.name}
-      </p>
+      {/* MENSAGENS */}
+ 
+      <h2 className="text-2xl font-bold mt-10 mb-4">
+        Messages
+      </h2>
+ 
+      <div className="space-y-4">
+ 
+        {messages.map((m)=>(
+          <div key={m.id} className="border p-4 rounded">
+ 
+            <p>{m.text}</p>
+ 
+          </div>
+        ))}
+ 
+      </div>
  
     </main>
- 
   )
- 
 }
  
