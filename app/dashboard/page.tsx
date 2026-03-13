@@ -1,15 +1,21 @@
 'use client'
  
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { supabase } from "../../lib/supabase"
  
 export default function Dashboard(){
  
+  const router = useRouter()
+ 
   const [profile,setProfile] = useState<any>(null)
+ 
   const [loading,setLoading] = useState(true)
  
   useEffect(()=>{
+ 
     loadProfile()
+ 
   },[])
  
   async function loadProfile(){
@@ -19,8 +25,11 @@ export default function Dashboard(){
     const user = userData.user
  
     if(!user){
-      alert("You must be logged in")
+ 
+      router.push("/login")
+ 
       return
+ 
     }
  
     const { data } = await supabase
@@ -30,47 +39,21 @@ export default function Dashboard(){
       .single()
  
     setProfile(data)
+ 
     setLoading(false)
  
   }
  
-  async function updateProfile(e:any){
- 
-    e.preventDefault()
- 
-    const { error } = await supabase
-      .from("cuddlers")
-      .update({
-        name:profile.name,
-        city:profile.city,
-        state:profile.state,
-        bio:profile.bio,
-        price:profile.price
-      })
-      .eq("id",profile.id)
- 
-    if(error){
-      alert("Error updating profile")
-    }else{
-      alert("Profile updated!")
-    }
- 
-  }
- 
   if(loading){
-    return(
-      <div className="p-10">
-        Loading dashboard...
-      </div>
-    )
+ 
+    return <div className="p-10">Loading...</div>
+ 
   }
  
   if(!profile){
-    return(
-      <div className="p-10">
-        You haven't created a cuddler profile yet.
-      </div>
-    )
+ 
+    return <div className="p-10">Create your cuddler profile first.</div>
+ 
   }
  
   return(
@@ -81,47 +64,13 @@ export default function Dashboard(){
         Your Dashboard
       </h1>
  
-      <form onSubmit={updateProfile} className="flex flex-col gap-4">
- 
-        <input
-        className="border p-3"
-        value={profile.name}
-        onChange={(e)=>setProfile({...profile,name:e.target.value})}
-        />
- 
-        <input
-        className="border p-3"
-        value={profile.city}
-        onChange={(e)=>setProfile({...profile,city:e.target.value})}
-        />
- 
-        <input
-        className="border p-3"
-        value={profile.state}
-        onChange={(e)=>setProfile({...profile,state:e.target.value})}
-        />
- 
-        <textarea
-        className="border p-3"
-        value={profile.bio}
-        onChange={(e)=>setProfile({...profile,bio:e.target.value})}
-        />
- 
-        <input
-        type="number"
-        className="border p-3"
-        value={profile.price}
-        onChange={(e)=>setProfile({...profile,price:e.target.value})}
-        />
- 
-        <button className="bg-black text-white p-3 rounded">
-          Update Profile
-        </button>
- 
-      </form>
+      <p>
+        Welcome {profile.name}
+      </p>
  
     </main>
  
   )
  
 }
+ 
