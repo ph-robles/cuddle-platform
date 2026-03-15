@@ -1,47 +1,111 @@
 "use client"
  
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
+import L from "leaflet"
+import { useEffect, useState } from "react"
  
-type User = {
-  id: string
-  name: string
-  lat: number
-  lng: number
+type Cuddler = {
+ id:string
+ name:string
+ lat:number
+ lng:number
 }
  
-export default function Map({ users }:{users:User[]}){
+type Props = {
+ cuddlers:Cuddler[]
+}
  
-  return (
+// corrige ícone padrão do Leaflet no Next
+delete (L.Icon.Default.prototype as any)._getIconUrl
+L.Icon.Default.mergeOptions({
+ iconRetinaUrl:
+  "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+ iconUrl:
+  "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+ shadowUrl:
+  "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png"
+})
  
-    <div style={{height:"500px",width:"100%"}}>
+function UserLocation(){
  
-      <MapContainer
-        center={[-22.9068,-43.1729]}
-        zoom={12}
-        style={{height:"100%",width:"100%"}}
-      >
+ const map = useMap()
  
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+ useEffect(()=>{
  
-        {users.map((user)=>(
-          <Marker
-            key={user.id}
-            position={[user.lat,user.lng]}
-          >
-            <Popup>
-              {user.name}
-            </Popup>
-          </Marker>
-        ))}
+ navigator.geolocation.getCurrentPosition((pos)=>{
  
-      </MapContainer>
+ const { latitude, longitude } = pos.coords
+ 
+ map.setView([latitude,longitude],13)
+ 
+ })
+ 
+ },[map])
+ 
+ return null
+ 
+}
+ 
+export default function Map({cuddlers}:Props){
+ 
+ const [position,setPosition] = useState<[number,number]>([-23.55,-46.63])
+ 
+ useEffect(()=>{
+ 
+ navigator.geolocation.getCurrentPosition((pos)=>{
+ 
+ setPosition([
+  pos.coords.latitude,
+  pos.coords.longitude
+ ])
+ 
+ })
+ 
+ },[])
+ 
+ return(
+ 
+ <MapContainer
+ center={position}
+ zoom={13}
+ style={{height:"600px",width:"100%"}}
+ >
+ 
+ <TileLayer
+  attribution='© OpenStreetMap'
+  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+ />
+ 
+ <UserLocation/>
+ 
+ {cuddlers.map((c)=>(
+  <Marker
+   key={c.id}
+   position={[c.lat,c.lng]}
+  >
+   <Popup>
+ 
+    <div>
+ 
+     <strong>{c.name}</strong>
+ 
+     <br/>
+ 
+     <a href={`/cuddler/${c.id}`}>
+      View profile
+     </a>
  
     </div>
  
-  )
+   </Popup>
+ 
+  </Marker>
+ ))}
+ 
+ </MapContainer>
+ 
+ )
  
 }
  
