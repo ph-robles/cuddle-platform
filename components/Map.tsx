@@ -1,39 +1,71 @@
 "use client"
  
-import { MapContainer,TileLayer,Marker,Popup } from "react-leaflet"
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
+import type { LatLngExpression } from "leaflet"
  
-export default function Map({cuddlers}:any){
+type User = {
+  id: string
+  name: string
+  lat: number
+  lng: number
+}
  
- return(
+type Props = {
+  users: User[]
+}
  
-  <MapContainer
-   center={[-22.9,-43.2]}
-   zoom={12}
-   style={{height:"500px"}}
-  >
+export default function Map({ users }: Props){
  
-   <TileLayer
-    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-   />
+  const center: LatLngExpression = [-22.9068, -43.1729]
  
-   {cuddlers.map((c:any)=>(
-    <Marker key={c.id} position={[c.lat,c.lng]}>
+  return (
  
-     <Popup>
+    <div style={{height:"500px",width:"100%"}}>
  
-      <b>{c.name}</b>
-      <br/>
-      ${c.price}/hour
+      <MapContainer
+        center={center}
+        zoom={12}
+        style={{height:"100%",width:"100%"}}
+      >
  
-     </Popup>
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution="&copy; OpenStreetMap"
+        />
  
-    </Marker>
-   ))}
+        {users.map((user)=>{
  
-  </MapContainer>
+          const position: LatLngExpression = [user.lat,user.lng]
  
- )
+          return(
+ 
+            <Marker
+              key={user.id}
+              position={position}
+            >
+ 
+              <Popup>
+ 
+                <div>
+                  <strong>{user.name}</strong>
+                  <br/>
+                  Available for cuddling
+                </div>
+ 
+              </Popup>
+ 
+            </Marker>
+ 
+          )
+ 
+        })}
+ 
+      </MapContainer>
+ 
+    </div>
+ 
+  )
  
 }
 
