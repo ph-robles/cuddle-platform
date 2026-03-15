@@ -3,78 +3,175 @@
 import { useEffect, useState } from "react"
 import dynamic from "next/dynamic"
 import { supabase } from "@/lib/supabase"
+import Image from "next/image"
+import { motion } from "framer-motion"
  
 const Map = dynamic(
-  () => import("@/components/Map"),
-  { ssr:false }
+ () => import("@/components/Map"),
+ { ssr:false }
 )
  
-type User = {
-  id: string
-  name: string
-  lat: number
-  lng: number
+type Cuddler = {
+ id:string
+ name:string
+ city:string
+ state:string
+ price:number
+ photo_url:string
+ lat:number
+ lng:number
 }
  
 export default function ExplorePage(){
  
-  const [users,setUsers] = useState<User[]>([])
-  const [loading,setLoading] = useState(true)
+ const [cuddlers,setCuddlers] = useState<Cuddler[]>([])
+ const [loading,setLoading] = useState(true)
  
-  useEffect(()=>{
+ useEffect(()=>{
  
-    async function loadUsers(){
+ async function load(){
  
-      const { data,error } = await supabase
-        .from("profiles")
-        .select("id,name,lat,lng")
-        .not("lat","is",null)
+ const {data,error} = await supabase
+ .from("cuddlers")
+ .select("*")
  
-      if(!error && data){
+ if(!error && data){
  
-        setUsers(data)
+ setCuddlers(data)
  
-      }
+ }
  
-      setLoading(false)
+ setLoading(false)
  
-    }
+ }
  
-    loadUsers()
+ load()
  
-  },[])
+ },[])
  
-  if(loading){
+ if(loading){
  
-    return(
+ return(
  
-      <main className="min-h-screen flex items-center justify-center">
+ <div className="min-h-screen flex items-center justify-center text-white bg-slate-950">
  
-        <p>Loading map...</p>
+ Loading cuddlers...
  
-      </main>
+ </div>
  
-    )
+ )
  
-  }
+ }
  
-  return(
+ return(
  
-    <main className="min-h-screen">
+ <div className="min-h-screen bg-slate-950 text-white">
  
-      <div className="max-w-6xl mx-auto p-6">
+ {/* HEADER */}
  
-        <h1 className="text-3xl font-bold mb-6">
-          Find Cuddlers Near You
-        </h1>
+ <div className="max-w-7xl mx-auto p-6">
  
-        <Map users={users}/>
+ <h1 className="text-3xl font-bold mb-2">
  
-      </div>
+ Find Cuddlers Near You
  
-    </main>
+ </h1>
  
-  )
+ <p className="text-gray-400 mb-8">
+ 
+ Browse professional cuddlers available in your area
+ 
+ </p>
+ 
+ </div>
+ 
+ 
+ <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 p-6">
+ 
+ 
+ {/* LISTA DE CUDDLERS */}
+ 
+ <div className="space-y-6 overflow-y-auto h-[600px] pr-4">
+ 
+ {cuddlers.map((cuddler)=>{
+ 
+ return(
+ 
+ <motion.div
+ key={cuddler.id}
+ whileHover={{scale:1.02}}
+ className="bg-slate-800 rounded-xl p-4 flex gap-4 shadow-lg"
+ >
+ 
+ <Image
+ src={cuddler.photo_url || "https://images.unsplash.com/photo-1494790108377-be9c29b29330"}
+ alt="cuddler"
+ width={120}
+ height={120}
+ className="rounded-lg object-cover"
+ />
+ 
+ <div className="flex flex-col justify-between">
+ 
+ <div>
+ 
+ <h2 className="text-xl font-semibold">
+ 
+ {cuddler.name}
+ 
+ </h2>
+ 
+ <p className="text-gray-400">
+ 
+ {cuddler.city}, {cuddler.state}
+ 
+ </p>
+ 
+ </div>
+ 
+ <div className="flex items-center gap-4 mt-3">
+ 
+ <span className="text-purple-400 font-bold">
+ 
+ ${cuddler.price}/hour
+ 
+ </span>
+ 
+ <button
+ className="bg-purple-600 px-4 py-2 rounded-lg hover:bg-purple-700"
+ >
+ 
+ View Profile
+ 
+ </button>
+ 
+ </div>
+ 
+ </div>
+ 
+ </motion.div>
+ 
+ )
+ 
+ })}
+ 
+ </div>
+ 
+ 
+ {/* MAPA */}
+ 
+ <div className="rounded-xl overflow-hidden">
+ 
+ <Map users={cuddlers}/>
+ 
+ </div>
+ 
+ 
+ </div>
+ 
+ </div>
+ 
+ )
  
 }
  
