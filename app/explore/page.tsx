@@ -112,11 +112,12 @@ export default function ExplorePage() {
 
                   </p>
 
-                  <button className="mt-4 bg-purple-600 px-4 py-2 rounded-lg hover:bg-purple-700">
-
+                  <a
+                    href={`/cuddler/${cuddler.id}`}
+                    className="bg-purple-600 px-4 py-2 rounded-lg hover:bg-purple-700"
+                  >
                     View Profile
-
-                  </button>
+                  </a>
 
                 </div>
 
