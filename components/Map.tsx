@@ -1,6 +1,6 @@
 "use client"
  
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet"
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 import L from "leaflet"
 import { useEffect, useState } from "react"
@@ -8,44 +8,21 @@ import { useEffect, useState } from "react"
 type Cuddler = {
  id:string
  name:string
- lat:number
- lng:number
+ lat:number | null
+ lng:number | null
 }
  
 type Props = {
  cuddlers:Cuddler[]
 }
  
-// corrige ícone padrão do Leaflet no Next
 delete (L.Icon.Default.prototype as any)._getIconUrl
+ 
 L.Icon.Default.mergeOptions({
- iconRetinaUrl:
-  "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
- iconUrl:
-  "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
- shadowUrl:
-  "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png"
+ iconRetinaUrl:"https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+ iconUrl:"https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+ shadowUrl:"https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png"
 })
- 
-function UserLocation(){
- 
- const map = useMap()
- 
- useEffect(()=>{
- 
- navigator.geolocation.getCurrentPosition((pos)=>{
- 
- const { latitude, longitude } = pos.coords
- 
- map.setView([latitude,longitude],13)
- 
- })
- 
- },[map])
- 
- return null
- 
-}
  
 export default function Map({cuddlers}:Props){
  
@@ -53,23 +30,28 @@ export default function Map({cuddlers}:Props){
  
  useEffect(()=>{
  
- navigator.geolocation.getCurrentPosition((pos)=>{
+ if(!navigator.geolocation) return
  
- setPosition([
-  pos.coords.latitude,
-  pos.coords.longitude
- ])
- 
- })
+ navigator.geolocation.getCurrentPosition(
+  (pos)=>{
+   setPosition([
+    pos.coords.latitude,
+    pos.coords.longitude
+   ])
+  },
+  ()=>{
+   console.log("location not allowed")
+  }
+ )
  
  },[])
  
  return(
  
  <MapContainer
- center={position}
- zoom={13}
- style={{height:"600px",width:"100%"}}
+  center={position}
+  zoom={13}
+  style={{height:"600px",width:"100%"}}
  >
  
  <TileLayer
@@ -77,26 +59,26 @@ export default function Map({cuddlers}:Props){
   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
  />
  
- <UserLocation/>
- 
- {cuddlers.map((c)=>(
+ {cuddlers
+ .filter(c=>c.lat && c.lng)
+ .map((c)=>(
   <Marker
    key={c.id}
-   position={[c.lat,c.lng]}
+   position={[c.lat!,c.lng!]}
   >
    <Popup>
  
-    <div>
+   <div>
  
-     <strong>{c.name}</strong>
+   <strong>{c.name}</strong>
  
-     <br/>
+   <br/>
  
-     <a href={`/cuddler/${c.id}`}>
-      View profile
-     </a>
+   <a href={`/cuddler/${c.id}`}>
+   View profile
+   </a>
  
-    </div>
+   </div>
  
    </Popup>
  
