@@ -31,35 +31,47 @@ export default async function ProfilePage({ params }: { params: { id: string } }
   }
  
   return (
-    <main style={{ maxWidth: 900, margin: "40px auto", padding: 20 }}>
+    <main className="max-w-3xl mx-auto p-6">
  
-      <h1>{cuddler.name}</h1>
+      {/* TÍTULO COM SELO VERIFIED */}
+ 
+      <h1 className="text-4xl font-bold flex items-center gap-3">
+ 
+        {cuddler.name}
+ 
+        {cuddler.verified && (
+          <span className="bg-green-500 text-white text-sm px-3 py-1 rounded">
+            Verified
+          </span>
+        )}
+ 
+      </h1>
  
       <Image
         src={cuddler.photo}
         alt={cuddler.name}
         width={300}
         height={300}
-        style={{ borderRadius: 12 }}
+        style={{ borderRadius: 12, marginTop: 20 }}
       />
  
       <p style={{ marginTop: 20 }}>
         {cuddler.description}
       </p>
  
-      <p>
+      <p className="mt-4">
         <strong>Cidade:</strong> {cuddler.city}
       </p>
  
-      <p style={{ fontSize: "24px", fontWeight: "bold", marginBottom: 20 }}>
+      <p className="text-2xl font-bold mb-6">
         ${cuddler.price} / hour
       </p>
  
-      {/* BOTÃO / FORMULÁRIO DE MENSAGEM */}
+      {/* BOTÃO DE MENSAGEM */}
  
       <MessageForm receiver_id={cuddler.user_id}/>
  
-      <h2 style={{ marginTop: 40 }}>
+      <h2 className="text-2xl font-bold mt-10 mb-4">
         Avaliações
       </h2>
  
@@ -67,12 +79,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         reviews.map((review: any) => (
           <div
             key={review.id}
-            style={{
-              border: "1px solid #ddd",
-              padding: 12,
-              borderRadius: 8,
-              marginTop: 10
-            }}
+            className="border p-4 rounded mb-3"
           >
             <strong>{review.name}</strong>
             <p>⭐ {review.rating}</p>
