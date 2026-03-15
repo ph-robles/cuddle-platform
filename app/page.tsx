@@ -3,63 +3,49 @@
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { supabase } from "../lib/supabase"
-import { useState } from "react"
  
 export default function Home(){
  
   const router = useRouter()
  
-  const [loading,setLoading] = useState(false)
- 
-  async function handleCuddler(){
- 
-    setLoading(true)
+  async function goCuddler(){
  
     const { data } = await supabase.auth.getUser()
  
-    const user = data?.user
- 
-    if(!user){
+    if(data?.user){
+      router.push("/dashboard")
+    }else{
       router.push("/login")
-      return
     }
- 
-    router.push("/dashboard")
  
   }
  
-  function handleClient(){
- 
+  function goClient(){
     router.push("/explore")
- 
   }
  
   return(
  
     <main className="min-h-screen flex items-center justify-center bg-gray-100">
  
-      <div className="max-w-4xl text-center px-6">
+      <div className="max-w-4xl text-center">
  
         <motion.h1
           initial={{opacity:0,y:-20}}
           animate={{opacity:1,y:0}}
-          transition={{duration:0.6}}
           className="text-5xl font-bold mb-6"
         >
           Welcome to Cuddle Platform
         </motion.h1>
  
-        <p className="text-gray-600 mb-12 text-lg">
+        <p className="text-gray-600 mb-10">
           Choose how you want to use the platform
         </p>
  
-        <div className="grid md:grid-cols-2 gap-10">
- 
-          {/* CUDDLER */}
+        <div className="grid md:grid-cols-2 gap-8">
  
           <motion.div
             whileHover={{scale:1.05}}
-            whileTap={{scale:0.95}}
             className="bg-white p-10 rounded-xl shadow-lg"
           >
  
@@ -72,20 +58,16 @@ export default function Home(){
             </p>
  
             <button
-              onClick={handleCuddler}
-              disabled={loading}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition w-full"
+              onClick={goCuddler}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg w-full hover:bg-blue-700"
             >
-              {loading ? "Checking login..." : "Continue as Cuddler"}
+              Continue
             </button>
  
           </motion.div>
  
-          {/* CLIENT */}
- 
           <motion.div
             whileHover={{scale:1.05}}
-            whileTap={{scale:0.95}}
             className="bg-white p-10 rounded-xl shadow-lg"
           >
  
@@ -98,8 +80,8 @@ export default function Home(){
             </p>
  
             <button
-              onClick={handleClient}
-              className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition w-full"
+              onClick={goClient}
+              className="bg-green-600 text-white px-6 py-3 rounded-lg w-full hover:bg-green-700"
             >
               Find Cuddlers
             </button>
