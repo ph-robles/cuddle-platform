@@ -1,19 +1,26 @@
-import ChatBox from "../../components/ChatBox"
+"use client"
+ 
+import Chat from "@/components/Chat"
  
 export default function ChatPage(){
  
-return(
+ const receiverId = "demo-user"
  
-  <main className="max-w-xl mx-auto p-10">
+ return(
  
-   <h1 className="text-3xl font-bold mb-6">
-    Chat
-   </h1>
+ <div className="max-w-2xl mx-auto p-6">
  
-   <ChatBox/>
+ <h1 className="text-2xl font-bold mb-6">
  
-  </main>
+ Chat
  
-)
+ </h1>
+ 
+ <Chat receiverId={receiverId}/>
+ 
+ </div>
+ 
+ )
  
 }
+ 
