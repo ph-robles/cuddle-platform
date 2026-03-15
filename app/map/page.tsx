@@ -47,7 +47,7 @@ export default function MapPage(){
         Cuddlers Near You
       </h1>
  
-      <Map users={users}/>
+    
  
     </main>
  
