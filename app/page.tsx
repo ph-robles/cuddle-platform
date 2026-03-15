@@ -1,3 +1,5 @@
+'use client'
+ 
 import Link from "next/link"
 import { motion } from "framer-motion"
  
@@ -7,7 +9,7 @@ export default function Home(){
  
     <main className="min-h-screen flex items-center justify-center bg-gray-100">
  
-      <div className="max-w-3xl text-center">
+      <div className="max-w-3xl text-center px-6">
  
         <motion.h1
           initial={{opacity:0,y:-20}}
@@ -26,7 +28,8 @@ export default function Home(){
  
           <motion.div
             whileHover={{scale:1.05}}
-            className="bg-white p-10 rounded-xl shadow-lg"
+            whileTap={{scale:0.98}}
+            className="bg-white p-10 rounded-xl shadow-lg transition"
           >
  
             <h2 className="text-2xl font-bold mb-4">
@@ -39,7 +42,7 @@ export default function Home(){
  
             <Link
               href="/register"
-              className="bg-blue-600 text-white px-6 py-3 rounded"
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg inline-block hover:bg-blue-700 transition"
             >
               Create Profile
             </Link>
@@ -48,7 +51,8 @@ export default function Home(){
  
           <motion.div
             whileHover={{scale:1.05}}
-            className="bg-white p-10 rounded-xl shadow-lg"
+            whileTap={{scale:0.98}}
+            className="bg-white p-10 rounded-xl shadow-lg transition"
           >
  
             <h2 className="text-2xl font-bold mb-4">
@@ -61,7 +65,7 @@ export default function Home(){
  
             <Link
               href="/explore"
-              className="bg-green-600 text-white px-6 py-3 rounded"
+              className="bg-green-600 text-white px-6 py-3 rounded-lg inline-block hover:bg-green-700 transition"
             >
               Find Cuddlers
             </Link>
