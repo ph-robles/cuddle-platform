@@ -1,21 +1,23 @@
 'use client'
  
 import { useState } from "react"
-import { createClient } from "@supabase/supabase-js"
+import { supabase } from "../../lib/supabase"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
  
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+export default function Login(){
  
-export default function LoginPage(){
+  const router = useRouter()
  
   const [email,setEmail] = useState("")
   const [password,setPassword] = useState("")
+  const [loading,setLoading] = useState(false)
  
-  async function handleLogin(e:React.FormEvent){
+  async function handleLogin(e:any){
+ 
     e.preventDefault()
+ 
+    setLoading(true)
  
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -23,55 +25,62 @@ export default function LoginPage(){
     })
  
     if(error){
+ 
       alert(error.message)
+      setLoading(false)
       return
+ 
     }
  
-    window.location.href="/dashboard"
+    router.push("/dashboard")
+    router.refresh()
+ 
   }
  
   return(
  
-    <main className="max-w-md mx-auto p-6">
+    <main className="min-h-screen flex items-center justify-center bg-gray-100">
  
-      <h1 className="text-3xl font-bold mb-6">
-        Login
-      </h1>
+      <div className="bg-white p-10 rounded-xl shadow-lg w-full max-w-md">
  
-      <form
-        onSubmit={handleLogin}
-        className="space-y-4"
-      >
- 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e)=>setEmail(e.target.value)}
-          className="border p-3 rounded w-full"
-        />
- 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e)=>setPassword(e.target.value)}
-          className="border p-3 rounded w-full"
-        />
- 
-        {/* BOTÃO COM ANIMAÇÃO */}
- 
-        <motion.button
-          whileHover={{scale:1.05}}
-          whileTap={{scale:0.95}}
-          className="bg-blue-600 text-white px-6 py-3 rounded w-full"
-        >
+        <h1 className="text-3xl font-bold mb-6 text-center">
           Login
-        </motion.button>
+        </h1>
  
-      </form>
+        <form onSubmit={handleLogin} className="space-y-4">
+ 
+          <input
+            type="email"
+            placeholder="Email"
+            className="border p-3 w-full rounded"
+            value={email}
+            onChange={(e)=>setEmail(e.target.value)}
+          />
+ 
+          <input
+            type="password"
+            placeholder="Password"
+            className="border p-3 w-full rounded"
+            value={password}
+            onChange={(e)=>setPassword(e.target.value)}
+          />
+ 
+          <motion.button
+            whileHover={{scale:1.05}}
+            whileTap={{scale:0.95}}
+            disabled={loading}
+            className="bg-blue-600 text-white px-6 py-3 rounded w-full"
+          >
+            {loading ? "Logging in..." : "Login"}
+          </motion.button>
+ 
+        </form>
+ 
+      </div>
  
     </main>
+ 
   )
+ 
 }
  

@@ -1,69 +1,52 @@
-'use client'
+"use client"
  
 import { useState } from "react"
-import { supabase } from "../lib/supabase"
+import { supabase } from "@/lib/supabase"
  
-export default function ReviewForm({ cuddler_id }: any) {
+export default function ReviewForm({cuddlerId}:any){
  
-  const [rating, setRating] = useState(5)
-  const [comment, setComment] = useState("")
+ const [rating,setRating]=useState(5)
+ const [comment,setComment]=useState("")
  
-  async function submitReview(e:any){
+ async function submit(){
  
-    e.preventDefault()
+  await supabase
+   .from("reviews")
+   .insert({
+    cuddler_id:cuddlerId,
+    rating,
+    comment
+   })
  
-    const { error } = await supabase
-      .from("reviews")
-      .insert([
-        {
-          cuddler_id,
-          rating,
-          comment
-        }
-      ])
+  alert("Review sent")
  
-    if(error){
-      alert("Error sending review")
-    }else{
-      alert("Review added")
-      location.reload()
-    }
+ }
  
-  }
+ return(
  
-  return (
+  <div className="mt-6 space-y-2">
  
-    <form onSubmit={submitReview} className="mt-10 flex flex-col gap-3">
+   <input
+    type="number"
+    value={rating}
+    onChange={(e)=>setRating(Number(e.target.value))}
+   />
  
-      <h3 className="text-xl font-bold">
-        Leave a review
-      </h3>
+   <textarea
+    value={comment}
+    onChange={(e)=>setComment(e.target.value)}
+   />
  
-      <select
-        value={rating}
-        onChange={(e)=>setRating(Number(e.target.value))}
-        className="border p-2"
-      >
-        <option value="5">5 ⭐</option>
-        <option value="4">4 ⭐</option>
-        <option value="3">3 ⭐</option>
-        <option value="2">2 ⭐</option>
-        <option value="1">1 ⭐</option>
-      </select>
+   <button
+    onClick={submit}
+    className="bg-black text-white px-4 py-2"
+   >
+    Submit Review
+   </button>
  
-      <textarea
-        placeholder="Write your experience"
-        className="border p-3"
-        value={comment}
-        onChange={(e)=>setComment(e.target.value)}
-      />
+  </div>
  
-      <button className="bg-black text-white p-3 rounded">
-        Submit Review
-      </button>
- 
-    </form>
- 
-  )
+ )
  
 }
+ 

@@ -61,7 +61,7 @@ export default function Navbar(){
               Login
             </Link>
  
-            <Link href="/signup">
+            <Link href="/register">
               Signup
             </Link>
           </>

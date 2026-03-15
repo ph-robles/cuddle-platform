@@ -1,50 +1,34 @@
-import { supabase } from "../../lib/supabase"
+import Link from "next/link"
  
-export default async function Dashboard(){
+export default function Dashboard(){
  
-  const { data:userData } = await supabase.auth.getUser()
+ return(
  
-  const user = userData?.user
+  <main className="max-w-4xl mx-auto p-10">
  
-  const { data:cuddler } = await supabase
-    .from("cuddlers")
-    .select("*")
-    .eq("user_id", user?.id)
-    .single()
+   <h1 className="text-3xl font-bold mb-6">
+    Dashboard
+   </h1>
  
-  return(
+   <div className="grid gap-4">
  
-    <main className="max-w-4xl mx-auto p-10">
+    <Link href="/search" className="p-4 border rounded">
+     Find Cuddlers
+    </Link>
  
-      <h1 className="text-3xl font-bold mb-6">
-        Dashboard
-      </h1>
+    <Link href="/map" className="p-4 border rounded">
+     View Map
+    </Link>
  
-      {cuddler ? (
+    <Link href="/chat" className="p-4 border rounded">
+     Messages
+    </Link>
  
-        <div className="bg-white p-6 rounded shadow">
+   </div>
  
-          <h2 className="text-xl font-bold mb-2">
-            {cuddler.name}
-          </h2>
+  </main>
  
-          <p>{cuddler.city}</p>
- 
-          <p className="text-blue-600 font-bold">
-            ${cuddler.price}/hour
-          </p>
- 
-        </div>
- 
-      ) : (
- 
-        <p>You haven't created a cuddler profile yet.</p>
- 
-      )}
- 
-    </main>
- 
-  )
+ )
  
 }
  
