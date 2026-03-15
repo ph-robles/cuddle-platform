@@ -1,120 +1,182 @@
-'use client'
+"use client"
  
 import { motion } from "framer-motion"
-import { useRouter } from "next/navigation"
-import { supabase } from "../lib/supabase"
-import { useState } from "react"
+import Link from "next/link"
+import Image from "next/image"
  
-export default function Home(){
+export default function Landing(){
  
-  const router = useRouter()
-  const [loading,setLoading] = useState(false)
+return(
  
-  async function goCuddler(){
+<div className="bg-slate-950 text-white min-h-screen">
  
-    setLoading(true)
+{/* NAVBAR */}
  
-    try{
+<nav className="flex justify-between items-center p-6 max-w-7xl mx-auto">
  
-      const { data, error } = await supabase.auth.getUser()
+<h1 className="text-2xl font-bold text-purple-400">
+CuddleConnect
+</h1>
  
-      if(error){
-        console.error(error)
-        router.push("/login")
-        return
-      }
+<div className="flex gap-6">
  
-      if(data?.user){
-        router.push("/register")
-      }else{
-        router.push("/login")
-      }
+<Link href="/explore">Find Cuddlers</Link>
+<Link href="/login">Login</Link>
  
-    }catch(err){
-      console.error(err)
-      router.push("/login")
-    }
+</div>
  
-    setLoading(false)
+</nav>
  
-  }
  
-  function goClient(){
-    router.push("/search")
-  }
+{/* HERO */}
  
-  return(
+<section className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center p-10">
  
-    <main className="min-h-screen flex items-center justify-center bg-gray-100">
+<motion.div
+initial={{opacity:0,y:40}}
+animate={{opacity:1,y:0}}
+>
  
-      <div className="max-w-4xl text-center">
+<h1 className="text-5xl font-bold leading-tight mb-6">
  
-        <motion.h1
-          initial={{opacity:0,y:-20}}
-          animate={{opacity:1,y:0}}
-          className="text-5xl font-bold mb-6"
-        >
-          Welcome to Cuddle Platform
-        </motion.h1>
+Human connection
+<br/>
+made simple
  
-        <p className="text-gray-600 mb-10">
-          Choose how you want to use the platform
-        </p>
+</h1>
  
-        <div className="grid md:grid-cols-2 gap-8">
+<p className="text-gray-400 mb-8">
  
-          <motion.div
-            whileHover={{scale:1.05}}
-            className="bg-white p-10 rounded-xl shadow-lg"
-          >
+Find professional cuddlers near you for safe,
+platonic sessions focused on relaxation,
+emotional wellbeing and human connection.
  
-            <h2 className="text-2xl font-bold mb-4">
-              I am a Cuddler
-            </h2>
+</p>
  
-            <p className="text-gray-500 mb-6">
-              Offer your cuddling services
-            </p>
+<div className="flex gap-4">
  
-            <button
-              onClick={goCuddler}
-              disabled={loading}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg w-full hover:bg-blue-700"
-            >
-              {loading ? "Loading..." : "Continue"}
-            </button>
+<Link
+href="/explore"
+className="bg-purple-600 px-6 py-3 rounded-lg hover:bg-purple-700"
+>
  
-          </motion.div>
+Find a Cuddler
  
-          <motion.div
-            whileHover={{scale:1.05}}
-            className="bg-white p-10 rounded-xl shadow-lg"
-          >
+</Link>
  
-            <h2 className="text-2xl font-bold mb-4">
-              I'm Looking for a Cuddler
-            </h2>
+<Link
+href="/signup"
+className="border border-purple-600 px-6 py-3 rounded-lg"
+>
  
-            <p className="text-gray-500 mb-6">
-              Find cuddling services near you
-            </p>
+Become a Cuddler
  
-            <button
-              onClick={goClient}
-              className="bg-green-600 text-white px-6 py-3 rounded-lg w-full hover:bg-green-700"
-            >
-              Find Cuddlers
-            </button>
+</Link>
  
-          </motion.div>
+</div>
  
-        </div>
+</motion.div>
  
-      </div>
  
-    </main>
+<Image
+src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2"
+alt="cuddle"
+width={500}
+height={400}
+className="rounded-xl"
+/>
  
-  )
+</section>
+ 
+ 
+ 
+{/* HOW IT WORKS */}
+ 
+<section className="max-w-6xl mx-auto py-20">
+ 
+<h2 className="text-3xl font-bold text-center mb-12">
+ 
+How it works
+ 
+</h2>
+ 
+<div className="grid md:grid-cols-3 gap-10">
+ 
+<div className="bg-slate-800 p-6 rounded-xl">
+ 
+<h3 className="text-xl font-semibold mb-2">
+Find a cuddler
+</h3>
+ 
+<p className="text-gray-400">
+ 
+Browse nearby professionals on the map.
+ 
+</p>
+ 
+</div>
+ 
+ 
+<div className="bg-slate-800 p-6 rounded-xl">
+ 
+<h3 className="text-xl font-semibold mb-2">
+Chat safely
+</h3>
+ 
+<p className="text-gray-400">
+ 
+Discuss boundaries and session details.
+ 
+</p>
+ 
+</div>
+ 
+ 
+<div className="bg-slate-800 p-6 rounded-xl">
+ 
+<h3 className="text-xl font-semibold mb-2">
+Book a session
+</h3>
+ 
+<p className="text-gray-400">
+ 
+Schedule your cuddle experience.
+ 
+</p>
+ 
+</div>
+ 
+</div>
+ 
+</section>
+ 
+ 
+ 
+{/* CTA */}
+ 
+<section className="text-center py-20">
+ 
+<h2 className="text-4xl font-bold mb-6">
+ 
+Ready to experience human connection?
+ 
+</h2>
+ 
+<Link
+href="/explore"
+className="bg-pink-500 px-8 py-4 rounded-lg text-lg"
+>
+ 
+Find Cuddlers Near You
+ 
+</Link>
+ 
+</section>
+ 
+ 
+</div>
+ 
+)
  
 }
  
