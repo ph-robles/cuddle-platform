@@ -1,33 +1,45 @@
 'use client'
  
 import Link from "next/link"
-import { supabase } from "../lib/supabase"
 import { useEffect, useState } from "react"
+import { createClient } from "@supabase/supabase-js"
 import { useRouter } from "next/navigation"
+ 
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
  
 export default function Navbar(){
  
-  const [user,setUser] = useState<any>(null)
- 
   const router = useRouter()
  
-  useEffect(()=>{
-    checkUser()
-  },[])
+  const [user,setUser] = useState<any>(null)
  
   async function checkUser(){
  
-    const { data } = await supabase.auth.getUser()
+    const { data:{user} } = await supabase.auth.getUser()
  
-    setUser(data.user)
+    setUser(user)
  
   }
+ 
+  useEffect(()=>{
+ 
+    checkUser()
+ 
+    const { data:listener } = supabase.auth.onAuthStateChange(()=>{
+      checkUser()
+      router.refresh()
+    })
+ 
+    return ()=> listener.subscription.unsubscribe()
+ 
+  },[])
  
   async function logout(){
  
     await supabase.auth.signOut()
- 
-    router.push("/")
  
     router.refresh()
  
@@ -35,57 +47,44 @@ export default function Navbar(){
  
   return(
  
-    <nav className="bg-white border-b shadow-sm">
+    <nav className="flex justify-between items-center p-4 border-b">
  
-      <div className="max-w-6xl mx-auto flex justify-between items-center p-4">
+      <Link href="/" className="font-bold text-xl">
+        Cuddle Platform
+      </Link>
  
-        <Link href="/" className="text-xl font-bold text-gray-900">
-          Cuddle Platform
-        </Link>
+      <div className="flex gap-4">
  
-        <div className="flex gap-6 items-center text-gray-700">
+        {!user && (
+          <>
+            <Link href="/login">
+              Login
+            </Link>
  
-          <Link href="/" className="hover:text-black">
-            Home
-          </Link>
+            <Link href="/signup">
+              Signup
+            </Link>
+          </>
+        )}
  
-          {user && (
-            <>
-              <Link href="/dashboard" className="hover:text-black">
-                Dashboard
-              </Link>
+        {user && (
+          <>
+            <Link href="/dashboard">
+              Dashboard
+            </Link>
  
-              <button
-                onClick={logout}
-                className="bg-red-500 text-white px-4 py-2 rounded"
-              >
-                Logout
-              </button>
-            </>
-          )}
- 
-          {!user && (
-            <>
-              <Link href="/login" className="hover:text-black">
-                Login
-              </Link>
- 
-              <Link
-                href="/register"
-                className="bg-blue-600 text-white px-4 py-2 rounded"
-              >
-                Register
-              </Link>
-            </>
-          )}
- 
-        </div>
+            <button
+              onClick={logout}
+              className="text-red-500"
+            >
+              Logout
+            </button>
+          </>
+        )}
  
       </div>
  
     </nav>
- 
   )
- 
 }
  

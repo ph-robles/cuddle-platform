@@ -1,18 +1,20 @@
 'use client'
  
 import { useState } from "react"
-import { supabase } from "../../lib/supabase"
-import { useRouter } from "next/navigation"
+import { createClient } from "@supabase/supabase-js"
+import { motion } from "framer-motion"
+ 
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
  
 export default function LoginPage(){
- 
-  const router = useRouter()
  
   const [email,setEmail] = useState("")
   const [password,setPassword] = useState("")
  
-  async function handleLogin(e:any){
- 
+  async function handleLogin(e:React.FormEvent){
     e.preventDefault()
  
     const { error } = await supabase.auth.signInWithPassword({
@@ -22,46 +24,54 @@ export default function LoginPage(){
  
     if(error){
       alert(error.message)
-    }else{
-      router.push("/")
+      return
     }
  
+    window.location.href="/dashboard"
   }
  
   return(
  
-    <main className="max-w-md mx-auto p-10">
+    <main className="max-w-md mx-auto p-6">
  
       <h1 className="text-3xl font-bold mb-6">
         Login
       </h1>
  
-      <form onSubmit={handleLogin} className="flex flex-col gap-4">
+      <form
+        onSubmit={handleLogin}
+        className="space-y-4"
+      >
  
         <input
-        type="email"
-        placeholder="Email"
-        className="border p-3"
-        value={email}
-        onChange={(e)=>setEmail(e.target.value)}
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e)=>setEmail(e.target.value)}
+          className="border p-3 rounded w-full"
         />
  
         <input
-        type="password"
-        placeholder="Password"
-        className="border p-3"
-        value={password}
-        onChange={(e)=>setPassword(e.target.value)}
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e)=>setPassword(e.target.value)}
+          className="border p-3 rounded w-full"
         />
  
-        <button className="bg-black text-white p-3 rounded">
+        {/* BOTÃO COM ANIMAÇÃO */}
+ 
+        <motion.button
+          whileHover={{scale:1.05}}
+          whileTap={{scale:0.95}}
+          className="bg-blue-600 text-white px-6 py-3 rounded w-full"
+        >
           Login
-        </button>
+        </motion.button>
  
       </form>
  
     </main>
- 
   )
- 
 }
+ 

@@ -1,67 +1,50 @@
-'use client'
+import { supabase } from "../../lib/supabase"
  
-import { useEffect, useState } from "react"
-import { createClient } from "@supabase/supabase-js"
+export default async function Dashboard(){
  
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+  const { data:userData } = await supabase.auth.getUser()
  
-export default function DashboardPage() {
+  const user = userData?.user
  
-  const [user, setUser] = useState<any>(null)
-  const [messages, setMessages] = useState<any[]>([])
+  const { data:cuddler } = await supabase
+    .from("cuddlers")
+    .select("*")
+    .eq("user_id", user?.id)
+    .single()
  
-  useEffect(() => {
-    loadProfile()
-  }, [])
+  return(
  
-  async function loadProfile() {
- 
-    const { data: { user } } = await supabase.auth.getUser()
- 
-    if (!user) {
-      window.location.href = "/login"
-      return
-    }
- 
-    setUser(user)
- 
-    const { data: messagesData } = await supabase
-      .from("messages")
-      .select("*")
-      .eq("receiver_id", user.id)
- 
-    setMessages(messagesData || [])
-  }
- 
-  return (
-    <main className="max-w-3xl mx-auto p-6">
+    <main className="max-w-4xl mx-auto p-10">
  
       <h1 className="text-3xl font-bold mb-6">
         Dashboard
       </h1>
  
-      {/* MENSAGENS */}
+      {cuddler ? (
  
-      <h2 className="text-2xl font-bold mt-10 mb-4">
-        Messages
-      </h2>
+        <div className="bg-white p-6 rounded shadow">
  
-      <div className="space-y-4">
+          <h2 className="text-xl font-bold mb-2">
+            {cuddler.name}
+          </h2>
  
-        {messages.map((m)=>(
-          <div key={m.id} className="border p-4 rounded">
+          <p>{cuddler.city}</p>
  
-            <p>{m.text}</p>
+          <p className="text-blue-600 font-bold">
+            ${cuddler.price}/hour
+          </p>
  
-          </div>
-        ))}
+        </div>
  
-      </div>
+      ) : (
+ 
+        <p>You haven't created a cuddler profile yet.</p>
+ 
+      )}
  
     </main>
+ 
   )
+ 
 }
  
