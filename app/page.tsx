@@ -3,25 +3,44 @@
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { supabase } from "../lib/supabase"
+import { useState } from "react"
  
 export default function Home(){
  
   const router = useRouter()
+  const [loading,setLoading] = useState(false)
  
   async function goCuddler(){
  
-    const { data } = await supabase.auth.getUser()
+    setLoading(true)
  
-    if(data?.user){
-      router.push("/dashboard")
-    }else{
+    try{
+ 
+      const { data, error } = await supabase.auth.getUser()
+ 
+      if(error){
+        console.error(error)
+        router.push("/login")
+        return
+      }
+ 
+      if(data?.user){
+        router.push("/register")
+      }else{
+        router.push("/login")
+      }
+ 
+    }catch(err){
+      console.error(err)
       router.push("/login")
     }
+ 
+    setLoading(false)
  
   }
  
   function goClient(){
-    router.push("/explore")
+    router.push("/search")
   }
  
   return(
@@ -59,9 +78,10 @@ export default function Home(){
  
             <button
               onClick={goCuddler}
+              disabled={loading}
               className="bg-blue-600 text-white px-6 py-3 rounded-lg w-full hover:bg-blue-700"
             >
-              Continue
+              {loading ? "Loading..." : "Continue"}
             </button>
  
           </motion.div>
