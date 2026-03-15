@@ -24,7 +24,7 @@ export default function ExplorePage() {
 
       const { data, error } = await supabase
         .from("cuddlers")
-        .select("*")
+        .select("id,name,city,state,price,photo_url")
 
       if (error) {
 
