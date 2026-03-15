@@ -12,9 +12,7 @@ export default function Navbar(){
   const router = useRouter()
  
   useEffect(()=>{
- 
     checkUser()
- 
   },[])
  
   async function checkUser(){
@@ -37,29 +35,29 @@ export default function Navbar(){
  
   return(
  
-    <nav className="bg-white shadow">
+    <nav className="bg-white border-b shadow-sm">
  
       <div className="max-w-6xl mx-auto flex justify-between items-center p-4">
  
-        <Link href="/" className="text-xl font-bold text-primary">
+        <Link href="/" className="text-xl font-bold text-gray-900">
           Cuddle Platform
         </Link>
  
-        <div className="flex gap-6 items-center">
+        <div className="flex gap-6 items-center text-gray-700">
  
-          <Link href="/" className="hover:text-primary">
+          <Link href="/" className="hover:text-black">
             Home
           </Link>
  
           {user && (
             <>
-              <Link href="/dashboard" className="hover:text-primary">
+              <Link href="/dashboard" className="hover:text-black">
                 Dashboard
               </Link>
  
               <button
                 onClick={logout}
-                className="bg-primary text-white px-4 py-2 rounded"
+                className="bg-red-500 text-white px-4 py-2 rounded"
               >
                 Logout
               </button>
@@ -68,13 +66,13 @@ export default function Navbar(){
  
           {!user && (
             <>
-              <Link href="/login" className="hover:text-primary">
+              <Link href="/login" className="hover:text-black">
                 Login
               </Link>
  
               <Link
                 href="/register"
-                className="bg-primary text-white px-4 py-2 rounded"
+                className="bg-blue-600 text-white px-4 py-2 rounded"
               >
                 Register
               </Link>
@@ -90,3 +88,4 @@ export default function Navbar(){
   )
  
 }
+ 

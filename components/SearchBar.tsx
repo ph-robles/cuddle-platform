@@ -1,35 +1,45 @@
 'use client'
  
-import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
  
-export default function SearchBar() {
+export default function SearchBar(){
  
-  const [city, setCity] = useState("")
+  const [city,setCity] = useState("")
+ 
   const router = useRouter()
  
-  function handleSearch() {
+  function search(e:any){
+ 
+    e.preventDefault()
+ 
+    if(!city) return
+ 
     router.push(`/search?city=${city}`)
+ 
   }
  
-  return (
-    <div className="flex gap-2 mb-10">
+  return(
+ 
+    <form
+      onSubmit={search}
+      className="bg-white shadow-md p-4 rounded flex gap-4 mt-6"
+    >
  
       <input
-        type="text"
-        placeholder="Search by city..."
-        className="border p-3 rounded w-full"
+        placeholder="Search city (Orlando, Miami...)"
+        className="border p-3 flex-1 rounded"
         value={city}
-        onChange={(e) => setCity(e.target.value)}
+        onChange={(e)=>setCity(e.target.value)}
       />
  
-      <button
-        onClick={handleSearch}
-        className="bg-black text-white px-6 py-3 rounded"
-      >
+      <button className="bg-blue-600 text-white px-6 rounded">
         Search
       </button>
  
-    </div>
+    </form>
+ 
   )
+ 
 }
+ 

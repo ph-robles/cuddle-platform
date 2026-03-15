@@ -1,6 +1,7 @@
 import { supabase } from "../lib/supabase"
 import Link from "next/link"
- 
+import SearchBar from "../components/SearchBar"
+
 export default async function Home(){
  
   const { data:cuddlers } = await supabase
@@ -29,6 +30,8 @@ export default async function Home(){
               Safe, professional and verified cuddling services.
               Book a session and relax with trusted cuddlers.
             </p>
+
+            <SearchBar/>
  
             <Link
               href="#cuddlers"
