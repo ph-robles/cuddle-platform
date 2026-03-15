@@ -1,65 +1,95 @@
 "use client"
  
-import { useState,useEffect } from "react"
+import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
+ 
+type Message = {
+  id: string
+  text: string
+}
  
 export default function ChatBox(){
  
- const [messages,setMessages]=useState<any[]>([])
- const [text,setText]=useState("")
+  const [messages,setMessages] = useState<Message[]>([])
+  const [text,setText] = useState("")
  
- async function send(){
+  async function send(){
  
-  await supabase
-   .from("messages")
-   .insert({text})
+    if(!text) return
  
-  setText("")
+    await supabase
+      .from("messages")
+      .insert({ text })
  
- }
+    setText("")
  
- useEffect(()=>{
+  }
  
-  const channel = supabase
-   .channel("messages")
-   .on(
-    "postgres_changes",
-    {event:"INSERT",schema:"public",table:"messages"},
-    payload=>{
-     setMessages(m=>[...m,payload.new])
+  useEffect(()=>{
+ 
+    const channel = supabase
+      .channel("messages")
+      .on(
+        "postgres_changes",
+        {
+          event:"INSERT",
+          schema:"public",
+          table:"messages"
+        },
+        (payload:any)=>{
+ 
+          setMessages((prev)=>[
+            ...prev,
+            payload.new
+          ])
+ 
+        }
+      )
+      .subscribe()
+ 
+    return ()=>{
+ 
+      supabase.removeChannel(channel)
+ 
     }
-   )
-   .subscribe()
  
-  return()=>supabase.removeChannel(channel)
+  },[])
  
- },[])
+  return(
  
- return(
+    <div className="space-y-4">
  
-  <div>
+      <div className="border p-4 h-64 overflow-y-auto">
  
-   <div className="space-y-2 mb-4">
+        {messages.map((m)=>(
+          <p key={m.id}>
+            {m.text}
+          </p>
+        ))}
  
-    {messages.map((m:any)=>(
-     <p key={m.id}>{m.text}</p>
-    ))}
+      </div>
  
-   </div>
+      <div className="flex gap-2">
  
-   <input
-    value={text}
-    onChange={(e)=>setText(e.target.value)}
-    className="border p-2"
-   />
+        <input
+          value={text}
+          onChange={(e)=>setText(e.target.value)}
+          className="border p-2 flex-1"
+          placeholder="Type message..."
+        />
  
-   <button onClick={send}>
-    Send
-   </button>
+        <button
+          onClick={send}
+          className="bg-blue-600 text-white px-4 py-2"
+        >
+          Send
+        </button>
  
-  </div>
+      </div>
  
- )
+    </div>
+ 
+  )
  
 }
  
