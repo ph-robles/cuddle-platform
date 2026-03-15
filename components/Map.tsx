@@ -2,7 +2,6 @@
  
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
-import type { LatLngExpression } from "leaflet"
  
 type User = {
   id: string
@@ -11,55 +10,32 @@ type User = {
   lng: number
 }
  
-type Props = {
-  users: User[]
-}
- 
-export default function Map({ users }: Props){
- 
-  const center: LatLngExpression = [-22.9068, -43.1729]
+export default function Map({ users }:{users:User[]}){
  
   return (
  
     <div style={{height:"500px",width:"100%"}}>
  
       <MapContainer
-        center={center}
+        center={[-22.9068,-43.1729]}
         zoom={12}
         style={{height:"100%",width:"100%"}}
       >
  
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution="&copy; OpenStreetMap"
         />
  
-        {users.map((user)=>{
- 
-          const position: LatLngExpression = [user.lat,user.lng]
- 
-          return(
- 
-            <Marker
-              key={user.id}
-              position={position}
-            >
- 
-              <Popup>
- 
-                <div>
-                  <strong>{user.name}</strong>
-                  <br/>
-                  Available for cuddling
-                </div>
- 
-              </Popup>
- 
-            </Marker>
- 
-          )
- 
-        })}
+        {users.map((user)=>(
+          <Marker
+            key={user.id}
+            position={[user.lat,user.lng]}
+          >
+            <Popup>
+              {user.name}
+            </Popup>
+          </Marker>
+        ))}
  
       </MapContainer>
  
@@ -68,5 +44,4 @@ export default function Map({ users }: Props){
   )
  
 }
-
  
