@@ -22,6 +22,8 @@ export default function MapExplore(){
  
  useEffect(()=>{
  
+ if(typeof window !== "undefined"){
+ 
  navigator.geolocation.getCurrentPosition((pos)=>{
  
  setUserLocation([
@@ -30,6 +32,8 @@ export default function MapExplore(){
  ])
  
  })
+ 
+ }
  
  },[])
  
@@ -51,7 +55,11 @@ export default function MapExplore(){
  
  if(!userLocation){
  
- return <p className="text-center mt-10">Loading map...</p>
+ return(
+  <div className="text-center mt-10">
+  Loading map...
+  </div>
+ )
  
  }
  
@@ -64,6 +72,7 @@ export default function MapExplore(){
  >
  
  <TileLayer
+  attribution="&copy; OpenStreetMap contributors"
   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
  />
  
@@ -83,9 +92,7 @@ export default function MapExplore(){
    onClick={()=>router.push(`/cuddler/${c.id}`)}
    className="mt-2 bg-purple-600 px-3 py-1 rounded"
   >
- 
   View Profile
- 
   </button>
  
   </div>
@@ -100,5 +107,4 @@ export default function MapExplore(){
  )
  
 }
-
  
